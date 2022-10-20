@@ -4,6 +4,7 @@ import Categories from '../components/Categories';
 import Sort from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
+import Pagination from '../components/Pagination';
 
 const Home = () => {
   const [items, setItems] = React.useState([]);
@@ -14,6 +15,12 @@ const Home = () => {
     sortProperty: 'rating',
   });
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const onChangePage = (number) => {
+    setCurrentPage(number);
+  };
+
   React.useEffect(() => {
     setIsLoading(true);
 
@@ -22,7 +29,7 @@ const Home = () => {
     const sortBy = sortType.sortProperty.replace('-', '');
 
     fetch(
-      `https://5eb55e95de5849001638b59c.mockapi.io/items?${category}&sortBy=${sortBy}&order=${order}`,
+      `https://5eb55e95de5849001638b59c.mockapi.io/items?page=${currentPage}&limit=4${category}&sortBy=${sortBy}&order=${order}`,
     )
       .then((res) => res.json())
       .then((arr) => {
@@ -30,7 +37,7 @@ const Home = () => {
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
-  }, [categoryId, sortType]);
+  }, [categoryId, sortType, currentPage]);
 
   return (
     <div className="container">
@@ -44,6 +51,8 @@ const Home = () => {
           ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
           : items.map((pizza) => <PizzaBlock key={pizza.id} {...pizza} />)}
       </div>
+
+      <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </div>
   );
 };
